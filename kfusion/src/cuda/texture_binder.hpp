@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kfusion/cuda/device_array.hpp>
+#include "cuda_fp16.h"
 #include <safe_call.hpp>
 
 namespace kfusion
