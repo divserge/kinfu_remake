@@ -477,7 +477,7 @@ namespace kfusion
 #endif
 
 #if __CUDA_ARCH__ >= 120
-                if (__all (x >= volume.dims.x) || __all (y >= volume.dims.y))
+                if (__all_sync (__activemask (), x >= volume.dims.x) || __all_sync (__activemask (), y >= volume.dims.y))
                     return;
 #else
                 if (Emulation::All(x >= volume.dims.x, cta_buffer) || Emulation::All(y >= volume.dims.y, cta_buffer))
@@ -574,7 +574,7 @@ namespace kfusion
 
 #if __CUDA_ARCH__ >= 200
                     ///not we fulfilled points array at current iteration
-                    int total_warp = __popc (__ballot (local_count > 0)) + __popc (__ballot (local_count > 1)) + __popc (__ballot (local_count > 2));
+                    int total_warp = __popc (__ballot_sync (__activemask (), local_count > 0)) + __popc (__ballot_sync (__activemask (), local_count > 1)) + __popc (__ballot_sync (__activemask (), local_count > 2));
 #else
                     int tid = Block::flattenedThreadId();
                     cta_buffer[tid] = local_count;
@@ -584,7 +584,7 @@ namespace kfusion
                     __shared__ float storage_Y[CTA_SIZE * MAX_LOCAL_POINTS];
                     __shared__ float storage_Z[CTA_SIZE * MAX_LOCAL_POINTS];
 
-                    if (total_warp > 0)
+                    if (total_warp > x)
                     {
                         int lane = Warp::laneId ();
                         int storage_index = (ftid >> Warp::LOG_WARP_SIZE) * Warp::WARP_SIZE * MAX_LOCAL_POINTS;
