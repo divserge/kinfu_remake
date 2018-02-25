@@ -37,10 +37,10 @@ struct KinFuApp
     void show_raycasted(KinFu& kinfu, int frame)
     {
         const int mode = 3;
-        kinfu.renderImage(view_device_, mode);
+        kinfu.renderImage(view_device_, kinfu.getCameraPose(), mode);
         view_host_.create(view_device_.rows(), view_device_.cols(), CV_8UC4);
         view_device_.download(view_host_.ptr<void>(), view_host_.step);
-        cv::imwrite(std::string("Scene.png"), view_host_);
+        cv::imwrite(std::string("Scene.jpg"), view_host_);
     }
 
     bool execute()
