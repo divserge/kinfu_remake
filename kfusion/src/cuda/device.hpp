@@ -52,14 +52,14 @@ __kf_device__ float3 kfusion::device::Reprojector::operator()(int u, int v, floa
 /// packing/unpacking tsdf volume element
 
 __kf_device__ ushort2 kfusion::device::pack_tsdf (float tsdf, int weight)
-{ return make_ushort2 (__float2half_rn (tsdf), weight); }
+{ return make_ushort2 (__half_as_ushort(__float2half_rn (tsdf)), weight); }
 
 __kf_device__ float kfusion::device::unpack_tsdf(ushort2 value, int& weight)
 {
     weight = value.y;
-    return __half2float (value.x);
+    return __half2float (__ushort_as_half(value.x));
 }
-__kf_device__ float kfusion::device::unpack_tsdf (ushort2 value) { return __half2float (value.x); }
+__kf_device__ float kfusion::device::unpack_tsdf (ushort2 value) { return __half2float (__ushort_as_half(value.x)); }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,9 +120,3 @@ namespace kfusion
     template<> __kf_device__ ushort2 kfusion::device::gmem::LdCs(ushort2* ptr) { return *ptr; }
     template<> __kf_device__ void kfusion::device::gmem::StCs(const ushort2& val, ushort2* ptr) { *ptr = val; }
 #endif
-
-
-
-
-
-

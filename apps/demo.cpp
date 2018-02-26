@@ -53,11 +53,15 @@ struct KinFuApp
         for (int i = 0; !exit_; ++i) {
             
             bool has_frame = capture_.grab(depth, image);
+            cv::Mat new_depth(depth);
             
             if (!has_frame)
                 return std::cout << "Can't grab" << std::endl, false;
 
             depth_device_.upload(depth.data, depth.step, depth.rows, depth.cols);
+            depth_device_.download(new_depth.data, new_depth.step);
+
+            cv::imwrite("Depth.png", new_depth);
 
             {
                 SampledScopeTime fps(time_ms); (void)fps;
@@ -75,11 +79,21 @@ struct KinFuApp
             );
 
             kinfu.tsdf().data().download(&buffer[0]);
-            std::cout << "downloaded" << std::endl;
-            std::cout << buffer[1000] << std::endl;
 
-            if (has_image)
+            for (int j = 0; j<buffer.size(); ++j) {
+                if (buffer[j] != 0) {
+                    std::cout << "something non trivial" << std::endl;
+                    break;
+                }
+            }
+
+            if (has_image) {
+                std::cout << "kek" << std::endl;
                 show_raycasted(kinfu, i);
+            } else {
+                std::cout << "kok" << std::endl;
+                show_raycasted(kinfu, i);
+            }
 
             // siz a = kinfu.tsdf().data()
 
