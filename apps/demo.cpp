@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <kfusion/kinfu.hpp>
@@ -55,45 +56,43 @@ struct KinFuApp
             bool has_frame = capture_.grab(depth, image);
             cv::Mat new_depth(depth);
             
-            if (!has_frame)
-                return std::cout << "Can't grab" << std::endl, false;
+            if (!has_frame) {
+                return std::cout << "Can't grab " <<  i << std::endl, false;
+            }
 
             depth_device_.upload(depth.data, depth.step, depth.rows, depth.cols);
             depth_device_.download(new_depth.data, new_depth.step);
 
-            cv::imwrite("Depth.png", new_depth);
+            //cv::imwrite("Depth.png", new_depth);
 
             {
                 SampledScopeTime fps(time_ms); (void)fps;
                 has_image = kinfu(depth_device_);
             }
 
-            std::cout << kinfu.tsdf().getDims() << std::endl;
-            std::cout << kinfu.tsdf().getVoxelSize() << std::endl;
-            std::cout << kinfu.tsdf().data().sizeBytes() / (512 * 512 * 512) << std::endl;
+            if (i == 350) {
+                std::vector<float> buffer (
+                    kinfu.tsdf().getDims()[0] *
+                    kinfu.tsdf().getDims()[1] *
+                    kinfu.tsdf().getDims()[2], 0
+                );
 
-            std::vector<float> buffer (
-                kinfu.tsdf().getDims()[0] *
-                kinfu.tsdf().getDims()[1] *
-                kinfu.tsdf().getDims()[2], 0
-            );
+                std::cout << kinfu.tsdf().getDims() << std::endl;
+                std::cout << kinfu.tsdf().getVoxelSize() << std::endl;
+                std::cout << "total size: " << kinfu.tsdf().data().sizeBytes() << std::endl;
 
-            kinfu.tsdf().data().download(&buffer[0]);
+                kinfu.tsdf().data().download(&buffer[0]);
 
-            for (int j = 0; j<buffer.size(); ++j) {
-                if (buffer[j] != 0) {
-                    std::cout << "something non trivial" << std::endl;
-                    break;
-                }
+                std::ofstream writeFile;
+                writeFile.open("tsdf.bin", std::ios::out | std::ios::binary);
+                writeFile.write(
+                    (char*)(&buffer[0]),
+                    int(buffer.size()) * sizeof(float)
+                );
             }
 
-            if (has_image) {
-                std::cout << "kek" << std::endl;
+            if (has_image)
                 show_raycasted(kinfu, i);
-            } else {
-                std::cout << "kok" << std::endl;
-                show_raycasted(kinfu, i);
-            }
 
             // siz a = kinfu.tsdf().data()
 
