@@ -4,6 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <kfusion/kinfu.hpp>
 #include <io/capture.hpp>
+#include <string>
 
 using namespace kfusion;
 
@@ -58,6 +59,26 @@ struct KinFuApp
             
             if (!has_frame) {
                 return std::cout << "Can't grab " <<  i << std::endl, false;
+            }
+
+            if (i == 0) {
+                std::cout << " " << depth.step << " " << depth.rows << " " << depth.cols << std::endl;
+            }
+
+            if (i < 20) {
+                std::vector<uint16_t> depth_vector(
+                    depth.begin<uint16_t>(),
+                    depth.end<uint16_t>()
+                );
+
+                std::string filename = "frame" + std::to_string(i) + ".bin";
+
+                std::ofstream writeFile;
+                    writeFile.open(filename, std::ios::out | std::ios::binary);
+                    writeFile.write(
+                        (char*)(&depth_vector[0]),
+                        int(depth_vector.size()) * 2 * sizeof(char)
+                );
             }
 
             depth_device_.upload(depth.data, depth.step, depth.rows, depth.cols);

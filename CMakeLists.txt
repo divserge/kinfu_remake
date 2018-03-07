@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.8)
 
 # ---[ Configurations types
+
+set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Possible configurations" FORCE)
 if (DEFINED CMAKE_BUILD_TYPE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES})
@@ -42,7 +44,7 @@ list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30 \
  )
 
 if(UNIX OR APPLE)
-  list(APPEND CUDA_NVCC_FLAGS "-Xcompiler;-fPIC;")
+  list(APPEND CUDA_NVCC_FLAGS "-Xcompiler;-fPIC;-std=c++11")
 endif()
 
 warnings_disable(CMAKE_CXX_FLAGS /wd4985)
