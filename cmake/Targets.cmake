@@ -89,7 +89,7 @@ macro(add_module_library name)
   set(__has_cuda OFF)
   check_cuda(__has_cuda)  
   
-  set(__lib_type STATIC)
+  set(__lib_type SHARED)
   if (${ARGV1} MATCHES "SHARED|STATIC")
     set(__lib_type ${ARGV1})
   endif()

@@ -15,9 +15,8 @@ include(cmake/Utils.cmake)
 include(cmake/Targets.cmake)
 
 # ---[ find dependencies
-find_package(OpenCV 3.4.0 REQUIRED COMPONENTS core viz highgui)
+find_package(OpenCV 3.4.0 REQUIRED COMPONENTS core)
 find_package(CUDA 9.0 REQUIRED)
-find_package(OpenNI REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} ${OPENNI_INCLUDE_DIR})
 
 # ---[ misc settings
@@ -42,10 +41,10 @@ list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30 \
  )
 
 if(UNIX OR APPLE)
-  list(APPEND CUDA_NVCC_FLAGS "-Xcompiler;-fPIC;")
+  list(APPEND CUDA_NVCC_FLAGS "-Xcompiler;-fPIC; -shared")
 endif()
 
 warnings_disable(CMAKE_CXX_FLAGS /wd4985)
 
 add_subdirectory(kfusion)
-add_subdirectory(apps)
+#add_subdirectory(apps)
