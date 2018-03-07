@@ -8,9 +8,8 @@ bool KinectFusionWrapper::capture_depth(
 	uint32_t nrows,
 	uint32_t ncols
 ) {
-	std::cout << depth_data.size() << std::endl;
-	cv::Mat depth (depth_data);
-	depth_device_.upload(depth.data, depth.step, nrows, ncols);
+	
+	depth_device_.upload(&depth_data[0], 2 * ncols, nrows, ncols);
 	
 	bool has_image = false;
 
