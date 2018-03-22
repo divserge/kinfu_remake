@@ -18,9 +18,16 @@ cdef extern from "kfusion.h":
 cdef class PyTsdfWrapper:
 	cdef TsdfWrapper cpp_tsdf
 	def __cinit__(self, wrapper):
-		self.cpp_tsdf = TsdfWrapper(wrapper)
+		self.cpp_tsdf = TsdfWrapper(
+			wrapper['tsdf'],
+			wrapper['dim_x'],
+			wrapper['dim_y'],
+			wrapper['dim_z']
+		)
 	def get_dims(self):
 		return (self.cpp_tsdf.dim_x, self.cpp_tsdf.dim_y, self.cpp_tsdf.dim_z)
+	def get_data(self):
+		return self.cpp_tsdf.tsdf
 
 cdef class PyKinectFusion:
 	cdef KinectFusionWrapper* cpp_kinfu
